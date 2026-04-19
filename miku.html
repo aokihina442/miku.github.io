@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>初音未来 - Hatsune Miku | 虚拟歌姬的世界</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --miku-cyan: #39C5BB;
+  --miku-cyan-light: #7FDBD3;
+  --miku-dark: #1a1a2e;
+  --miku-darker: #0f0f1a;
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.15);
+  --glass-shadow: rgba(0,0,0,0.3);
+  --text-primary: #fff;
+  --text-secondary: rgba(255,255,255,0.7);
+  --text-muted: rgba(255,255,255,0.4);
+  --accent-pink: #FF6B9D;
+  --accent-purple: #A855F7;
+  --accent-yellow: #FCD34D;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--miku-darker);color:var(--text-primary);overflow-x:hidden;line-height:1.8}
+
+/* ── BG ── */
+.bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(57,197,187,.15) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 20%,rgba(168,85,247,.1) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 80%,rgba(255,107,157,.08) 0%,transparent 50%),var(--miku-darker)}
+.particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.particle{position:absolute;border-radius:50%;background:var(--miku-cyan);opacity:0;animation:floatParticle linear infinite}
+@keyframes floatParticle{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.6}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+
+/* ── Glass ── */
+.glass{background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:20px;box-shadow:0 8px 32px var(--glass-shadow),inset 0 1px 0 rgba(255,255,255,.1)}
+.glass-strong{background:rgba(255,255,255,.12);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.2);border-radius:24px;box-shadow:0 8px 32px var(--glass-shadow),inset 0 1px 0 rgba(255,255,255,.15)}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;left:0;width:100%;z-index:1000;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;background:rgba(15,15,26,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(57,197,187,.15);transition:all .3s}
+nav.scrolled{padding:10px 40px;background:rgba(15,15,26,.95)}
+.nav-logo{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,var(--miku-cyan),var(--accent-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;font-weight:400;letter-spacing:1px;transition:all .3s;position:relative;padding-bottom:4px}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--miku-cyan);transition:width .3s}
+.nav-links a:hover{color:var(--miku-cyan)}
+.nav-links a:hover::after{width:100%}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:1001}
+.nav-hamburger span{width:28px;height:2px;background:var(--text-primary);transition:all .3s}
+
+/* ── Hero ── */
+.hero{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;overflow:hidden}
+.hero-bg-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:.18;filter:blur(2px);z-index:0}
+.hero-content{max-width:900px;animation:fadeInUp 1s ease-out;position:relative;z-index:1}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.hero-badge{display:inline-block;padding:6px 20px;border-radius:50px;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;background:rgba(57,197,187,.15);border:1px solid rgba(57,197,187,.3);color:var(--miku-cyan)}
+.hero h1{font-family:'Orbitron',sans-serif;font-size:clamp(3rem,8vw,6rem);font-weight:900;line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--miku-cyan-light),var(--miku-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradientShift 4s ease infinite}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-jp{font-size:clamp(1.5rem,4vw,2.5rem);font-weight:300;color:var(--text-secondary);margin-bottom:32px;letter-spacing:8px}
+.hero-desc{font-size:1.1rem;color:var(--text-secondary);max-width:650px;margin:0 auto 48px;line-height:2}
+.hero-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.stat-item{text-align:center}
+.stat-number{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:700;color:var(--miku-cyan);display:block}
+.stat-label{font-size:.85rem;color:var(--text-muted);letter-spacing:1px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted);font-size:.75rem;letter-spacing:2px;animation:bounce 2s infinite}
+.scroll-indicator .arrow{width:20px;height:20px;border-right:2px solid var(--miku-cyan);border-bottom:2px solid var(--miku-cyan);transform:rotate(45deg)}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+
+/* ── Sections ── */
+section{position:relative;z-index:2;padding:100px 40px;max-width:1200px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:64px}
+.section-tag{display:inline-block;font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:var(--miku-cyan);margin-bottom:12px}
+.section-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin-bottom:16px}
+.section-subtitle{color:var(--text-secondary);max-width:600px;margin:0 auto;font-size:1rem}
+
+/* ── Profile ── */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.profile-visual{display:flex;justify-content:center;align-items:center}
+.miku-avatar{width:320px;height:320px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(57,197,187,.2),transparent 70%);overflow:hidden;animation:avatarPulse 3s ease-in-out infinite}
+@keyframes avatarPulse{0%,100%{box-shadow:0 0 60px rgba(57,197,187,.2)}50%{box-shadow:0 0 100px rgba(57,197,187,.4)}}
+.miku-avatar img{width:100%;height:100%;object-fit:cover;opacity:.9}
+.avatar-ring{position:absolute;border-radius:50%;border:1px solid rgba(57,197,187,.2);animation:spin 20s linear infinite;pointer-events:none}
+.avatar-ring:first-of-type{width:360px;height:360px}
+.avatar-ring:last-of-type{width:400px;height:400px;border-color:rgba(168,85,247,.15);animation-duration:30s;animation-direction:reverse}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.profile-info{padding:20px}
+.profile-info h3{font-size:1.8rem;margin-bottom:24px;color:var(--miku-cyan)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.info-item{padding:16px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:all .3s}
+.info-item:hover{background:rgba(57,197,187,.08);border-color:rgba(57,197,187,.2);transform:translateY(-2px)}
+.info-label{font-size:.75rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.info-value{font-size:1rem;font-weight:500}
+
+/* ── About ── */
+.about-content{padding:48px}
+.about-text{color:var(--text-secondary);font-size:1.05rem;line-height:2.2;margin-bottom:32px}
+.about-text:last-child{margin-bottom:0}
+.highlight{color:var(--miku-cyan);font-weight:500}
+
+/* ── About feature cards ── */
+.about-features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px}
+.about-feature{padding:24px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);text-align:center;transition:all .3s}
+.about-feature:hover{background:rgba(57,197,187,.08);border-color:rgba(57,197,187,.2);transform:translateY(-4px)}
+.about-feature-img{width:100%;height:160px;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.about-feature-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.about-feature:hover .about-feature-img img{transform:scale(1.08)}
+.about-feature h4{font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--miku-cyan)}
+.about-feature p{font-size:.85rem;color:var(--text-secondary);line-height:1.6}
+
+/* ── Gallery ── */
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.gallery-item{border-radius:16px;overflow:hidden;position:relative;height:220px;cursor:pointer;transition:all .4s}
+.gallery-item:first-child{grid-column:span 2;grid-row:span 2;height:auto}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.gallery-item:hover{transform:scale(1.02);box-shadow:0 12px 40px rgba(57,197,187,.2)}
+.gallery-item:hover img{transform:scale(1.1)}
+.gallery-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);opacity:0;transition:opacity .3s}
+.gallery-item:hover .gallery-overlay{opacity:1}
+.gallery-overlay span{color:#fff;font-size:.9rem;font-weight:500}
+
+/* ── Timeline ── */
+.timeline{position:relative;padding-left:40px}
+.timeline::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--miku-cyan),var(--accent-purple),var(--accent-pink));border-radius:2px}
+.timeline-item{position:relative;margin-bottom:40px;padding:28px;border-radius:16px;transition:all .3s}
+.timeline-item:hover{background:rgba(255,255,255,.05)}
+.timeline-item::before{content:'';position:absolute;left:-33px;top:36px;width:12px;height:12px;border-radius:50%;background:var(--miku-cyan);border:3px solid var(--miku-darker);box-shadow:0 0 15px rgba(57,197,187,.5)}
+.timeline-year{font-family:'Orbitron',sans-serif;font-size:.9rem;color:var(--miku-cyan);margin-bottom:8px;letter-spacing:2px}
+.timeline-title{font-size:1.2rem;font-weight:700;margin-bottom:8px}
+.timeline-desc{color:var(--text-secondary);font-size:.95rem;line-height:1.8}
+.timeline-img{width:100%;height:200px;border-radius:12px;overflow:hidden;margin-top:16px}
+.timeline-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.timeline-item:hover .timeline-img img{transform:scale(1.05)}
+
+/* ── Song Cards ── */
+.songs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
+.song-card{padding:32px;border-radius:20px;transition:all .4s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative;overflow:hidden}
+.song-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--miku-cyan),var(--accent-purple));opacity:0;transition:opacity .3s}
+.song-card:hover{transform:translateY(-8px);background:rgba(255,255,255,.12);border-color:rgba(57,197,187,.3)}
+.song-card:hover::before{opacity:1}
+.song-cover{width:100%;height:180px;border-radius:12px;overflow:hidden;margin-bottom:16px;position:relative}
+.song-cover img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.song-cover svg{width:100%;height:100%}
+.song-card:hover .song-cover img{transform:scale(1.08)}
+.song-number{font-family:'Orbitron',sans-serif;font-size:3rem;font-weight:900;color:rgba(57,197,187,.15);position:absolute;top:16px;right:24px;line-height:1}
+.song-title{font-size:1.3rem;font-weight:700;margin-bottom:4px}
+.song-title-jp{font-size:.9rem;color:var(--text-muted);margin-bottom:12px}
+.song-meta{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.song-tag{padding:3px 12px;border-radius:20px;font-size:.75rem;background:rgba(57,197,187,.12);color:var(--miku-cyan);border:1px solid rgba(57,197,187,.2)}
+.song-tag.pop{background:rgba(255,107,157,.12);color:var(--accent-pink);border-color:rgba(255,107,157,.2)}
+.song-tag.rock{background:rgba(168,85,247,.12);color:var(--accent-purple);border-color:rgba(168,85,247,.2)}
+.song-tag.ballad{background:rgba(252,211,77,.12);color:var(--accent-yellow);border-color:rgba(252,211,77,.2)}
+.song-tag.electronic{background:rgba(56,189,248,.12);color:#38BDF8;border-color:rgba(56,189,248,.2)}
+.song-desc{color:var(--text-secondary);font-size:.9rem;line-height:1.8}
+.song-views{margin-top:12px;font-size:.8rem;color:var(--text-muted)}
+
+/* ── Producer Cards ── */
+.producers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.producer-card{padding:28px;border-radius:20px;text-align:center;transition:all .4s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden}
+.producer-card:hover{transform:translateY(-8px) scale(1.02);background:rgba(255,255,255,.12);border-color:rgba(57,197,187,.3)}
+.producer-icon{width:80px;height:80px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,rgba(57,197,187,.2),rgba(168,85,247,.2));border:2px solid rgba(57,197,187,.3)}
+.producer-name{font-size:1.2rem;font-weight:700;margin-bottom:4px}
+.producer-aka{font-size:.8rem;color:var(--text-muted);margin-bottom:12px}
+.producer-style{display:inline-block;padding:4px 14px;border-radius:20px;font-size:.75rem;background:rgba(168,85,247,.12);color:var(--accent-purple);border:1px solid rgba(168,85,247,.2);margin-bottom:12px}
+.producer-desc{color:var(--text-secondary);font-size:.9rem;line-height:1.7}
+.producer-works{margin-top:12px;font-size:.8rem;color:var(--miku-cyan)}
+
+/* ── Concert Cards ── */
+.concert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.concert-card{padding:32px;border-radius:20px;transition:all .3s;position:relative;overflow:hidden}
+.concert-card:hover{transform:translateY(-4px);border-color:rgba(57,197,187,.3)}
+.concert-img-wrap{width:100%;height:200px;border-radius:14px;overflow:hidden;margin-bottom:20px}
+.concert-img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.concert-card:hover .concert-img{transform:scale(1.08)}
+.concert-year{font-family:'Orbitron',sans-serif;font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--miku-cyan),var(--accent-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.concert-name{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.concert-location{color:var(--text-muted);font-size:.85rem;margin-bottom:12px}
+.concert-desc{color:var(--text-secondary);font-size:.9rem;line-height:1.7}
+
+/* ── Impact Cards ── */
+.impact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.impact-card{padding:36px;border-radius:20px;transition:all .3s}
+.impact-card:hover{transform:translateY(-4px);border-color:rgba(57,197,187,.3)}
+.impact-img-wrap{width:100%;height:180px;border-radius:14px;overflow:hidden;margin-bottom:16px}
+.impact-img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.impact-card:hover .impact-img{transform:scale(1.08)}
+.impact-icon{font-size:2.5rem;margin-bottom:16px}
+.impact-title{font-size:1.2rem;font-weight:700;margin-bottom:12px}
+.impact-desc{color:var(--text-secondary);font-size:.95rem;line-height:1.8}
+
+/* ── V6 Banner ── */
+.v6-banner{padding:60px;text-align:center;background:linear-gradient(135deg,rgba(57,197,187,.1),rgba(168,85,247,.1));border:1px solid rgba(57,197,187,.2);position:relative;overflow:hidden}
+.v6-banner::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(57,197,187,.05),transparent,rgba(168,85,247,.05),transparent);animation:spin 15s linear infinite}
+.v6-content{position:relative;z-index:1}
+.v6-label{display:inline-block;padding:6px 20px;border-radius:50px;font-size:.8rem;letter-spacing:3px;background:rgba(57,197,187,.2);color:var(--miku-cyan);margin-bottom:20px}
+.v6-title{font-family:'Orbitron',sans-serif;font-size:2.5rem;font-weight:900;margin-bottom:16px}
+.v6-desc{color:var(--text-secondary);font-size:1.05rem;max-width:700px;margin:0 auto;line-height:1.9}
+.v6-img{width:100%;max-width:700px;height:300px;border-radius:16px;overflow:hidden;margin:30px auto 0}
+.v6-img img{width:100%;height:100%;object-fit:cover}
+
+/* ── Visualizer ── */
+.music-visualizer{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:60px;margin:40px auto;max-width:400px}
+.bar{width:6px;background:linear-gradient(to top,var(--miku-cyan),var(--accent-purple));border-radius:3px;animation:equalize .8s ease-in-out infinite alternate}
+@keyframes equalize{from{height:8px}to{height:var(--bar-height,40px)}}
+
+/* ── Tabs ── */
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:40px;flex-wrap:wrap}
+.tab-btn{padding:10px 24px;border-radius:50px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text-secondary);cursor:pointer;font-size:.9rem;font-family:'Noto Sans SC',sans-serif;transition:all .3s}
+.tab-btn:hover{background:rgba(57,197,187,.1);border-color:rgba(57,197,187,.3);color:var(--miku-cyan)}
+.tab-btn.active{background:rgba(57,197,187,.15);border-color:var(--miku-cyan);color:var(--miku-cyan)}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(30px);transition:all .8s cubic-bezier(.4,0,.2,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── Back to Top ── */
+.back-to-top{position:fixed;bottom:30px;right:30px;width:50px;height:50px;border-radius:50%;background:rgba(57,197,187,.2);backdrop-filter:blur(10px);border:1px solid rgba(57,197,187,.3);color:var(--miku-cyan);font-size:1.2rem;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(20px);transition:all .3s}
+.back-to-top.visible{opacity:1;transform:translateY(0)}
+.back-to-top:hover{background:rgba(57,197,187,.3);transform:translateY(-2px)}
+
+/* ── Footer ── */
+footer{position:relative;z-index:2;text-align:center;padding:60px 40px;border-top:1px solid rgba(255,255,255,.06)}
+.footer-logo{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,var(--miku-cyan),var(--accent-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.footer-text{color:var(--text-muted);font-size:.85rem;margin-bottom:8px}
+.footer-links{display:flex;justify-content:center;gap:24px;margin-top:20px}
+.footer-links a{color:var(--text-secondary);text-decoration:none;font-size:.85rem;transition:color .3s}
+.footer-links a:hover{color:var(--miku-cyan)}
+
+/* ── Loader ── */
+.page-loader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--miku-darker);display:flex;align-items:center;justify-content:center;z-index:10000;transition:opacity .5s}
+.page-loader.hidden{opacity:0;pointer-events:none}
+.loader-text{font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--miku-cyan);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--miku-darker)}
+::-webkit-scrollbar-thumb{background:var(--miku-cyan);border-radius:3px}
+::selection{background:rgba(57,197,187,.3);color:#fff}
+
+/* ── Voicebank Timeline ── */
+.vb-timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.vb-card{padding:28px 20px;border-radius:16px;text-align:center;transition:all .4s;position:relative;overflow:hidden}
+.vb-card:hover{transform:translateY(-6px);border-color:rgba(57,197,187,.4);background:rgba(57,197,187,.08)}
+.vb-version{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;margin-bottom:4px}
+.vb-year{font-size:.8rem;color:var(--miku-cyan);letter-spacing:2px;margin-bottom:12px}
+.vb-engine{font-size:.85rem;font-weight:600;margin-bottom:8px}
+.vb-desc{font-size:.85rem;color:var(--text-secondary);line-height:1.6}
+.vb-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;margin-top:10px;background:rgba(57,197,187,.15);color:var(--miku-cyan);border:1px solid rgba(57,197,187,.25)}
+
+/* ── Vocaloid Family ── */
+.family-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px}
+.family-card{padding:24px 16px;border-radius:16px;text-align:center;transition:all .4s;cursor:default}
+.family-card:hover{transform:translateY(-6px) scale(1.03)}
+.family-avatar{width:72px;height:72px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:2px solid rgba(255,255,255,.15)}
+.family-name{font-size:1rem;font-weight:700;margin-bottom:2px}
+.family-jp{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+.family-info{font-size:.8rem;color:var(--text-secondary);line-height:1.5}
+.family-color{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+
+/* ── Games ── */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.game-card{padding:28px;border-radius:20px;transition:all .4s;overflow:hidden}
+.game-card:hover{transform:translateY(-6px);border-color:rgba(57,197,187,.3)}
+.game-img{width:100%;height:180px;border-radius:14px;overflow:hidden;margin-bottom:16px}
+.game-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.game-card:hover .game-img img{transform:scale(1.08)}
+.game-title{font-size:1.2rem;font-weight:700;margin-bottom:4px}
+.game-subtitle{font-size:.8rem;color:var(--text-muted);margin-bottom:12px}
+.game-tags{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.game-tag{padding:3px 10px;border-radius:14px;font-size:.7rem;background:rgba(168,85,247,.12);color:var(--accent-purple);border:1px solid rgba(168,85,247,.2)}
+.game-desc{font-size:.9rem;color:var(--text-secondary);line-height:1.7}
+.game-stat{margin-top:10px;font-size:.8rem;color:var(--miku-cyan)}
+
+/* ── Lyrics Wall ── */
+.lyrics-carousel{position:relative;max-width:800px;margin:0 auto;overflow:hidden}
+.lyric-slide{display:none;text-align:center;padding:48px 32px;animation:fadeSlide .6s ease}
+.lyric-slide.active{display:block}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.lyric-text{font-size:1.4rem;font-weight:300;line-height:2.2;color:var(--text-primary);margin-bottom:16px;font-style:italic}
+.lyric-source{font-size:.9rem;color:var(--miku-cyan)}
+.lyric-artist{font-size:.8rem;color:var(--text-muted);margin-top:4px}
+.lyric-dots{display:flex;justify-content:center;gap:8px;margin-top:24px}
+.lyric-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .3s}
+.lyric-dot.active{background:var(--miku-cyan);transform:scale(1.3)}
+
+/* ── Merch ── */
+.merch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.merch-card{padding:24px;border-radius:16px;text-align:center;transition:all .3s}
+.merch-card:hover{transform:translateY(-4px);border-color:rgba(57,197,187,.3)}
+.merch-icon{font-size:2.5rem;margin-bottom:12px}
+.merch-title{font-size:1rem;font-weight:700;margin-bottom:8px}
+.merch-desc{font-size:.85rem;color:var(--text-secondary);line-height:1.6}
+
+/* ── FAQ ── */
+.faq-list{max-width:800px;margin:0 auto}
+.faq-item{margin-bottom:12px;border-radius:14px;overflow:hidden}
+.faq-q{padding:18px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;transition:all .3s;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+.faq-q:hover{background:rgba(57,197,187,.08);border-color:rgba(57,197,187,.2)}
+.faq-q .arrow{transition:transform .3s;font-size:.8rem;color:var(--miku-cyan)}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s ease;padding:0 24px;color:var(--text-secondary);font-size:.95rem;line-height:1.8;background:rgba(255,255,255,.02)}
+.faq-item.open .faq-a{max-height:300px;padding:0 24px 18px}
+
+@media(max-width:768px){
+  nav{padding:12px 20px}
+  .nav-links{display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(15,15,26,.98);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:32px}
+  .nav-links.open{display:flex}
+  .nav-hamburger{display:flex}
+  section{padding:60px 20px}
+  .profile-grid{grid-template-columns:1fr;text-align:center}
+  .info-grid{grid-template-columns:1fr}
+  .songs-grid{grid-template-columns:1fr}
+  .producers-grid{grid-template-columns:1fr}
+  .concert-grid{grid-template-columns:1fr}
+  .impact-grid{grid-template-columns:1fr}
+  .about-features{grid-template-columns:1fr}
+  .hero h1{font-size:2.5rem}
+  .hero-stats{gap:24px}
+  .miku-avatar{width:220px;height:220px}
+  .avatar-ring:first-of-type{width:260px;height:260px}
+  .avatar-ring:last-of-type{width:290px;height:290px}
+  .about-content{padding:24px}
+  .v6-banner{padding:32px}
+  .v6-title{font-size:1.8rem}
+  .gallery-grid{grid-template-columns:1fr 1fr}
+  .gallery-item:first-child{grid-column:span 2;grid-row:span 1;height:200px}
+  .gallery-item{height:150px}
+  .concert-img-wrap{height:160px}
+  .impact-img-wrap{height:140px}
+  .vb-timeline{grid-template-columns:1fr}
+  .family-grid{grid-template-columns:repeat(2,1fr)}
+  .games-grid{grid-template-columns:1fr}
+  .merch-grid{grid-template-columns:1fr}
+  .lyric-text{font-size:1.1rem}
+  .faq-q{font-size:.9rem;padding:14px 18px}
+}
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div class="page-loader" id="pageLoader"><div class="loader-text">MIKU LOADING...</div></div>
+
+<!-- BG -->
+<div class="bg-canvas"></div>
+<div class="particles" id="particles"></div>
+
+<!-- Nav -->
+<nav id="navbar">
+  <div class="nav-logo">MIKU</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero" onclick="closeNav()">首页</a></li>
+    <li><a href="#about" onclick="closeNav()">关于</a></li>
+    <li><a href="#gallery" onclick="closeNav()">视觉</a></li>
+    <li><a href="#timeline" onclick="closeNav()">历程</a></li>
+    <li><a href="#songs" onclick="closeNav()">名曲</a></li>
+    <li><a href="#producers" onclick="closeNav()">P主</a></li>
+    <li><a href="#concerts" onclick="closeNav()">演唱会</a></li>
+    <li><a href="#voicebank" onclick="closeNav()">声源</a></li>
+    <li><a href="#family" onclick="closeNav()">家族</a></li>
+    <li><a href="#games" onclick="closeNav()">游戏</a></li>
+    <li><a href="#lyrics" onclick="closeNav()">歌词</a></li>
+    <li><a href="#impact" onclick="closeNav()">影响</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <img src="https://safebooru.org/images/568/a6204ec1f141e491f107cecb87aaa4fecf357a5d.jpg" alt="Hatsune Miku" class="hero-bg-img">
+  <div class="hero-content">
+    <div class="hero-badge">VOCALOID ★ VIRTUAL SINGER</div>
+    <h1>HATSUNE MIKU</h1>
+    <div class="hero-jp">初音ミク</div>
+    <p class="hero-desc">来自未来的歌声，响彻世界的第一个虚拟歌姬。<br>诞生于2007年，由CRYPTON FUTURE MEDIA基于YAMAHA的VOCALOID技术开发。<br>她的声音属于每一个创作者，她的形象由全世界共同定义。</p>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-number counter" data-target="100000">0</span><span class="stat-label">万+ 粉丝</span></div>
+      <div class="stat-item"><span class="stat-number counter" data-target="1000000">0</span><span class="stat-label">万+ 原创曲目</span></div>
+      <div class="stat-item"><span class="stat-number counter" data-target="17">0</span><span class="stat-label">年 传奇</span></div>
+    </div>
+  </div>
+  <div class="scroll-indicator"><span>SCROLL</span><div class="arrow"></div></div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="section-header reveal">
+    <div class="section-tag">About</div>
+    <h2 class="section-title">关于初音未来</h2>
+    <p class="section-subtitle">从一款声音合成软件，到全球文化现象</p>
+  </div>
+  <div class="profile-grid reveal">
+    <div class="profile-visual">
+      <div class="miku-avatar">
+        <img src="https://safebooru.org/images/568/50585b8558e9766783441cc9a11c1b750f35006c.jpg" alt="初音未来 Racing Miku 2026">
+        <div class="avatar-ring"></div>
+        <div class="avatar-ring"></div>
+      </div>
+    </div>
+    <div class="profile-info glass">
+      <h3>角色档案</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">名字</div><div class="info-value">初音ミク</div></div>
+        <div class="info-item"><div class="info-label">罗马音</div><div class="info-value">Hatsune Miku</div></div>
+        <div class="info-item"><div class="info-label">身高</div><div class="info-value">158cm</div></div>
+        <div class="info-item"><div class="info-label">体重</div><div class="info-value">42kg</div></div>
+        <div class="info-item"><div class="info-label">年龄</div><div class="info-value">16岁</div></div>
+        <div class="info-item"><div class="info-label">生日</div><div class="info-value">2007年8月31日</div></div>
+        <div class="info-item"><div class="info-label">声源</div><div class="info-value">藤田咲（Saki Fujita）</div></div>
+        <div class="info-item"><div class="info-label">开发者</div><div class="info-value">CRYPTON FUTURE MEDIA</div></div>
+        <div class="info-item"><div class="info-label">代表色</div><div class="info-value" style="color:var(--miku-cyan)">■ 葱绿 / #39C5BB</div></div>
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-value">VOCALOID 2→6</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="about-content glass reveal" style="margin-top:40px">
+    <p class="about-text"><span class="highlight">初音未来（Hatsune Miku）</span>是CRYPTON FUTURE MEDIA株式会社于<span class="highlight">2007年8月31日</span>发售的VOCALOID系列语音合成软件的音源库角色。她以YAMAHA开发的VOCALOID语音合成引擎为基础，使用声优<span class="highlight">藤田咲</span>的声音数据采样合成而成。</p>
+    <p class="about-text">名字来源于日语：「<span class="highlight">初音（はつね）</span>」意为「最初的声音」，「<span class="highlight">ミク（Miku）</span>」源自「未来（みらい）」，合在一起便是「<span class="highlight">来自未来的最初之音</span>」。她的标志性形象——双马尾、葱绿色调、短裙制服——由插画师<span class="highlight">KEI</span>设计，已成为全球二次元文化的标志性符号。</p>
+    <p class="about-text">与传统虚拟偶像不同，初音未来的特殊之处在于她是一个<span class="highlight">「用户生成内容（UGC）」</span>的开放平台。任何人都可以购买软件，为她作词作曲并发布音乐。正是这种去中心化的创作模式，使得初音未来从一款产品演变为一场<span class="highlight">全球性的文化运动</span>。创作者们被称为「<span class="highlight">P主（Producer）</span>」，他们赋予了初音未来灵魂。</p>
+    <p class="about-text">初音未来的意义远超音乐软件本身：她打破了虚拟与现实的界限，举办过<span class="highlight">全息投影演唱会</span>，代言过丰田、谷歌等国际品牌，出现在无数游戏、动漫、艺术展览中，成为了人类历史上最成功的虚拟偶像——一个<span class="highlight">属于全世界创作者的共同作品</span>。</p>
+
+    <div class="about-features">
+      <div class="about-feature">
+        <div class="about-feature-img">
+          <img src="https://safebooru.org/images/822/e804c371d1b355e47a86db7e371fe3737a113a9d.jpg" alt="初音未来弹吉他">
+        </div>
+        <h4>🎵 音乐创作</h4>
+        <p>任何人都可以用VOCALOID软件为初音未来创作歌曲，无需专业录音棚</p>
+      </div>
+      <div class="about-feature">
+        <div class="about-feature-img">
+          <img src="https://safebooru.org/images/816/012b3351040876ccde8823ef84bdbe2d86e3d04b.png" alt="初音未来演奏键盘">
+        </div>
+        <h4>✨ 全息演唱会</h4>
+        <p>运用尖端全息投影技术，让虚拟歌姬走上真实舞台</p>
+      </div>
+      <div class="about-feature">
+        <div class="about-feature-img">
+          <img src="https://safebooru.org/images/312/b23302ec65a2315399de3a2e850b41283d7136df.png" alt="Project SEKAI Miku">
+        </div>
+        <h4>🎨 数字艺术</h4>
+        <p>全球画师共创，初音未来的形象从未被"官方"限定</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section id="gallery">
+  <div class="section-header reveal">
+    <div class="section-tag">Gallery</div>
+    <h2 class="section-title">视觉世界</h2>
+    <p class="section-subtitle">音乐、舞台、数字艺术交织的视觉盛宴</p>
+  </div>
+  <div class="gallery-grid reveal">
+    <div class="gallery-item glass"><img src="https://safebooru.org/images/2453/26972610c2cdddcf2ab3ad66efe2fdaecca95865.jpg" alt="初音未来演唱"><div class="gallery-overlay"><span>🎤 歌声传达世界</span></div></div>
+    <div class="gallery-item glass"><img src="https://safebooru.org/images/3124/1a797ff99f03e09ee5111424542918553745d561.png" alt="初音未来弹钢琴"><div class="gallery-overlay"><span>🎹 海边的旋律</span></div></div>
+    <div class="gallery-item glass"><img src="https://safebooru.org/images/1840/7a522ab3f782fa968aae4ad15076c9b1e688b3c9.jpg" alt="初音未来演奏"><div class="gallery-overlay"><span>✨ 指尖流淌的音符</span></div></div>
+    <div class="gallery-item glass"><img src="https://safebooru.org/images/822/e804c371d1b355e47a86db7e371fe3737a113a9d.jpg" alt="初音未来吉他"><div class="gallery-overlay"><span>🎸 摇滚之魂</span></div></div>
+    <div class="gallery-item glass"><img src="https://safebooru.org/images/568/a6204ec1f141e491f107cecb87aaa4fecf357a5d.jpg" alt="初音未来花"><div class="gallery-overlay"><span>🌸 花瓣纷飞</span></div></div>
+    <div class="gallery-item glass"><img src="https://safebooru.org/images/568/50585b8558e9766783441cc9a11c1b750f35006c.jpg" alt="Racing Miku"><div class="gallery-overlay"><span>🏁 Racing Miku 2026</span></div></div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section id="timeline">
+  <div class="section-header reveal">
+    <div class="section-tag">History</div>
+    <h2 class="section-title">传奇历程</h2>
+    <p class="section-subtitle">从一个声音样本，到全球文化现象</p>
+  </div>
+  <div class="timeline reveal">
+    <div class="timeline-item glass">
+      <div class="timeline-year">2007.08.31</div>
+      <div class="timeline-title">🌟 诞生之日</div>
+      <div class="timeline-desc">初音未来VOCALOID2正式发售。发售初期仅预估数百套销量，但仅两周内便突破数千套，最终创下VOCALOID系列最畅销纪录。KEI设计的绿色双马尾少女形象迅速在网络上走红。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/312/b23302ec65a2315399de3a2e850b41283d7136df.png" alt="初音未来诞生"></div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2007—2008</div>
+      <div class="timeline-title">🎵 创作爆发</div>
+      <div class="timeline-desc">Niconico动画上涌现大量初音未来翻唱与原创作品。甩葱歌（Ievan Polkka）的翻唱动画成为现象级传播，ryo（supercell）发布的「メルト」成为百万播放级名曲。初音未来从软件变为了一种文化。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/2453/26972610c2cdddcf2ab3ad66efe2fdaecca95865.jpg" alt="创作爆发时代"></div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2009</div>
+      <div class="timeline-title">🎤 首次演唱会</div>
+      <div class="timeline-desc">「初音未来日的感谢祭」演唱会在Zepp Tokyo举办，约2500名观众到场。运用全息投影技术，初音未来以3D形象在舞台上真实演唱，开创了虚拟歌手演唱会的先河。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/816/012b3351040876ccde8823ef84bdbe2d86e3d04b.png" alt="首次演唱会"></div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2010</div>
+      <div class="timeline-title">🌍 走向世界</div>
+      <div class="timeline-desc">初音未来在新加坡、美国Anime Expo等地举办海外演唱会。Toyota采用初音未来作为广告代言人，在美国市场投放「世界第一公主殿下」广告曲，引发全球媒体关注。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/568/50585b8558e9766783441cc9a11c1b750f35006c.jpg" alt="走向世界"></div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2011</div>
+      <div class="timeline-title">📈 百万曲目时代</div>
+      <div class="timeline-desc">初音未来的曲目数量突破百万。和田たけあき（wowaka）的「ロールギャール」、黒うさP的「千年の独奏歌」等经典作品相继诞生，VOCALOID亚文化进入黄金时期。</div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2012—2014</div>
+      <div class="timeline-title">🎨 全球文化符号</div>
+      <div class="timeline-desc">与LV、Marc Jacobs等奢侈品牌联名；作品在纽约MoMA展出；千本樱成为百万级传唱经典。Mitchie M以超高真实度的调教闻名，推动了VOCALOID技术的极限。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/568/a6204ec1f141e491f107cecb87aaa4fecf357a5d.jpg" alt="全球文化符号"></div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2020</div>
+      <div class="timeline-title">📱 SEGA & 游戏</div>
+      <div class="timeline-desc">「Project SEKAI feat. 初音ミク」手游上线，成为全球热门音乐游戏，累计下载量超过3000万。初音未来在游戏领域迎来新的高峰。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/312/b23302ec65a2315399de3a2e850b41283d7136df.png" alt="Project SEKAI"></div>
+    </div>
+    <div class="timeline-item glass">
+      <div class="timeline-year">2024—2026</div>
+      <div class="timeline-title">🚀 新纪元 V6</div>
+      <div class="timeline-desc">2024年初音未来举办大型世界巡演。2026年4月14日，全新「初音未来 V6」声音合成软件正式发售，引入更真实的歌唱合成技术与全新视觉形象，标志着虚拟歌手技术的又一次飞跃。</div>
+      <div class="timeline-img"><img src="https://safebooru.org/images/568/50585b8558e9766783441cc9a11c1b750f35006c.jpg" alt="V6 新纪元"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Songs -->
+<section id="songs">
+  <div class="section-header reveal">
+    <div class="section-tag">Songs</div>
+    <h2 class="section-title">经典名曲</h2>
+    <p class="section-subtitle">这些歌曲定义了一个时代，塑造了初音未来的灵魂</p>
+  </div>
+  <div class="music-visualizer" id="visualizer"></div>
+  <div class="tabs reveal">
+    <button class="tab-btn active" onclick="filterSongs('all')">全部</button>
+    <button class="tab-btn" onclick="filterSongs('pop')">流行</button>
+    <button class="tab-btn" onclick="filterSongs('rock')">摇滚</button>
+    <button class="tab-btn" onclick="filterSongs('ballad')">抒情</button>
+    <button class="tab-btn" onclick="filterSongs('electronic')">电子</button>
+  </div>
+  <div class="songs-grid reveal" id="songsGrid">
+
+    <div class="song-card glass" data-genre="electronic">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#39C5BB"/><stop offset="100%" stop-color="#38BDF8"/></linearGradient></defs><rect width="600" height="300" fill="url(#g1)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="80" font-family="sans-serif" opacity="0.3">🥬</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif" font-weight="bold">Ievan Polkka</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">甩葱歌</text></svg></div>
+      <span class="song-number">01</span>
+      <div class="song-title">甩葱歌 / Ievan Polkka</div><div class="song-title-jp">イェヴァン・ポルカ</div>
+      <div class="song-meta"><span class="song-tag electronic">电子</span></div>
+      <div class="song-desc">改编自芬兰民歌，是初音未来最早走红的标志性作品。魔性的旋律搭配甩葱动画，让初音未来在2007年迅速出圈，成为互联网上最早的现象级VOCALOID视频。</div>
+      <div class="song-views">📺 Niconico播放量：500万+</div>
+    </div>
+
+    <div class="song-card glass" data-genre="pop">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B9D"/><stop offset="100%" stop-color="#FCD34D"/></linearGradient></defs><rect width="600" height="300" fill="url(#g2)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="80" font-family="sans-serif" opacity="0.3">💕</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif" font-weight="bold">メルト</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">MELT</text></svg></div>
+      <span class="song-number">02</span>
+      <div class="song-title">MELT / メルト</div><div class="song-title-jp">メルト</div>
+      <div class="song-meta"><span class="song-tag pop">流行</span></div>
+      <div class="song-desc">由ryo（supercell）创作的初音未来早期代表作，旋律甜美讲述了少女对恋人的思念之情，完美展现了VOCALOID音乐的商业潜力。在「你的名字。」中也有登场。</div>
+      <div class="song-views">📺 Niconico播放量：1400万+ | P主：ryo (supercell)</div>
+    </div>
+
+    <div class="song-card glass" data-genre="pop">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#A855F7"/><stop offset="100%" stop-color="#FF6B9D"/></linearGradient></defs><rect width="600" height="300" fill="url(#g3)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="80" font-family="sans-serif" opacity="0.3">👑</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="24" font-family="sans-serif" font-weight="bold">World is Mine</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">世界第一公主殿下</text></svg></div>
+      <span class="song-number">03</span>
+      <div class="song-title">世界第一公主殿下 / World is Mine</div><div class="song-title-jp">ワールドイズマイン</div>
+      <div class="song-meta"><span class="song-tag pop">流行</span></div>
+      <div class="song-desc">同样出自ryo之手，旋律华丽高傲，歌词描绘了一位任性可爱的公主形象。这首歌是初音未来演唱会的固定曲目，也被Toyota用作美国市场广告曲。</div>
+      <div class="song-views">📺 Niconico播放量：1700万+ | P主：ryo (supercell)</div>
+    </div>
+
+    <div class="song-card glass" data-genre="rock">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E84393"/><stop offset="50%" stop-color="#FF6B9D"/><stop offset="100%" stop-color="#FCD34D"/></linearGradient></defs><rect width="600" height="300" fill="url(#g4)"/><text x="300" y="100" text-anchor="middle" fill="white" font-size="40" font-family="sans-serif" opacity="0.4">🌸🌸🌸</text><text x="300" y="170" text-anchor="middle" fill="white" font-size="32" font-family="sans-serif" font-weight="bold">千本桜</text><text x="300" y="210" text-anchor="middle" fill="white" font-size="18" font-family="sans-serif" opacity="0.8">Senbonzakura</text><text x="300" y="250" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.6">黒うさP</text></svg></div>
+      <span class="song-number">04</span>
+      <div class="song-title">千本樱 / Senbonzakura</div><div class="song-title-jp">千本桜</div>
+      <div class="song-meta"><span class="song-tag rock">摇滚</span></div>
+      <div class="song-desc">黒うさP创作的大正浪漫风格摇滚名曲，以日本大正时代为背景，融合了浓厚的和风与现代摇滚元素。MV超过2800万播放，是初音未来人气最高的歌曲之一。</div>
+      <div class="song-views">📺 Niconico播放量：2800万+ | P主：黒うさP</div>
+    </div>
+
+    <div class="song-card glass" data-genre="rock">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><rect width="600" height="300" fill="url(#g5)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="70" font-family="sans-serif" opacity="0.3">🌀</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="24" font-family="sans-serif" font-weight="bold">Rolling Girl</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">ロールギャール</text></svg></div>
+      <span class="song-number">05</span>
+      <div class="song-title">Rolling Girl / ロールギャール</div><div class="song-title-jp">ロールギャール</div>
+      <div class="song-meta"><span class="song-tag rock">摇滚</span></div>
+      <div class="song-desc">wowaka的代表作，以强烈的情绪表达和高速吉他演奏著称。歌词深刻描绘了心理挣扎与自我认同，被视为VOCALOID音乐中最具艺术深度的作品之一。</div>
+      <div class="song-views">📺 Niconico播放量：1000万+ | P主：wowaka (現実逃避P)</div>
+    </div>
+
+    <div class="song-card glass" data-genre="electronic">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g6" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#39C5BB"/></linearGradient></defs><rect width="600" height="300" fill="url(#g6)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="70" font-family="sans-serif" opacity="0.3">⚡</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="22" font-family="sans-serif" font-weight="bold">裏表ラバーズ</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.7">Two-Faced Lovers</text></svg></div>
+      <span class="song-number">06</span>
+      <div class="song-title">里表ラバーズ / Two-Faced Lovers</div><div class="song-title-jp">裏表ラバーズ</div>
+      <div class="song-meta"><span class="song-tag electronic">电子</span></div>
+      <div class="song-desc">wowaka的另一部杰作，以极速的电子编曲和密集的歌词著称。呈现了社交媒体时代人们双重面孔的主题，节奏感极强。</div>
+      <div class="song-views">📺 Niconico播放量：800万+ | P主：wowaka</div>
+    </div>
+
+    <div class="song-card glass" data-genre="pop">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g7" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#39C5BB"/><stop offset="50%" stop-color="#A855F7"/><stop offset="100%" stop-color="#FF6B9D"/></linearGradient></defs><rect width="600" height="300" fill="url(#g7)"/><text x="300" y="100" text-anchor="middle" fill="white" font-size="50" font-family="sans-serif" opacity="0.4">🌐</text><text x="300" y="180" text-anchor="middle" fill="white" font-size="30" font-family="sans-serif" font-weight="bold">Tell Your World</text><text x="300" y="220" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.7">Google Chrome × kz (livetune)</text></svg></div>
+      <span class="song-number">07</span>
+      <div class="song-title">Tell Your World</div><div class="song-title-jp">テルユアワールド</div>
+      <div class="song-meta"><span class="song-tag pop">流行</span></div>
+      <div class="song-desc">kz（livetune）为Google Chrome制作的广告主题曲。MV由Rhizomatiks制作，描绘了初音未来在数字世界中歌唱、用音乐连接全世界的故事。</div>
+      <div class="song-views">📺 YouTube播放量：5000万+ | P主：kz (livetune)</div>
+    </div>
+
+    <div class="song-card glass" data-genre="pop">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g8" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#39C5BB"/><stop offset="100%" stop-color="#7FDBD3"/></linearGradient></defs><rect width="600" height="300" fill="url(#g8)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="80" font-family="sans-serif" opacity="0.3">🎤</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="32" font-family="sans-serif" font-weight="bold">39 Music!</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">サンキュー ミュージック</text></svg></div>
+      <span class="song-number">08</span>
+      <div class="song-title">39 Music! / サンキュー ミュージック</div><div class="song-title-jp">39ミュージック！</div>
+      <div class="song-meta"><span class="song-tag pop">流行</span></div>
+      <div class="song-desc">みきとP创作的欢快名曲。「39」在日语中可读作「サンキュー（Thank You）」或「ミク（Miku）」，是初音未来的代表数字。充满了对音乐和VOCALOID文化的热爱。</div>
+      <div class="song-views">📺 Niconico播放量：600万+ | P主：みきとP</div>
+    </div>
+
+    <div class="song-card glass" data-genre="rock">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g9" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B9D"/><stop offset="100%" stop-color="#FCD34D"/></linearGradient></defs><rect width="600" height="300" fill="url(#g9)"/><text x="300" y="120" text-anchor="middle" fill="white" font-size="70" font-family="sans-serif" opacity="0.3">🎸</text><text x="300" y="200" text-anchor="middle" fill="white" font-size="24" font-family="sans-serif" font-weight="bold">メランコリック</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">Melancholic</text></svg></div>
+      <span class="song-number">09</span>
+      <div class="song-title">メランコリック / Melancholic</div><div class="song-title-jp">メランコリック</div>
+      <div class="song-meta"><span class="song-tag rock">摇滚</span></div>
+      <div class="song-desc">Junky创作的活力摇滚曲，欢快的节奏和充满个性的编曲闻名。初音未来在其中展现了调皮可爱的一面，旋律朗朗上口。</div>
+      <div class="song-views">📺 Niconico播放量：700万+ | P主：Junky</div>
+    </div>
+
+    <div class="song-card glass" data-genre="electronic">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#A855F7"/><stop offset="100%" stop-color="#38BDF8"/></linearGradient></defs><rect width="600" height="300" fill="url(#g10)"/><text x="300" y="110" text-anchor="middle" fill="white" font-size="60" font-family="sans-serif" opacity="0.3">🌅</text><text x="300" y="190" text-anchor="middle" fill="white" font-size="26" font-family="sans-serif" font-weight="bold">Freely Tomorrow</text><text x="300" y="230" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.7">フリートゥモロー · Mitchie M</text></svg></div>
+      <span class="song-number">10</span>
+      <div class="song-title">Freely Tomorrow</div><div class="song-title-jp">フリートゥモロー</div>
+      <div class="song-meta"><span class="song-tag electronic">电子</span></div>
+      <div class="song-desc">Mitchie M以超高真实度调教闻名的代表作。初音未来的歌声几乎听不出是合成音源，展现了VOCALOID调教技术的巅峰。</div>
+      <div class="song-views">📺 Niconico播放量：500万+ | P主：Mitchie M</div>
+    </div>
+
+    <div class="song-card glass" data-genre="ballad">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g11" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f0f1a"/><stop offset="100%" stop-color="#39C5BB"/></linearGradient></defs><rect width="600" height="300" fill="url(#g11)"/><text x="300" y="110" text-anchor="middle" fill="white" font-size="60" font-family="sans-serif" opacity="0.4">⭐✨⭐</text><text x="300" y="190" text-anchor="middle" fill="white" font-size="26" font-family="sans-serif" font-weight="bold">星のカケラ</text><text x="300" y="230" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">星之碎片 · DECO*27</text></svg></div>
+      <span class="song-number">11</span>
+      <div class="song-title">星之碎片 / 星のカケラ</div><div class="song-title-jp">星のカケラ</div>
+      <div class="song-meta"><span class="song-tag ballad">抒情</span></div>
+      <div class="song-desc">DECO*27创作的抒情名曲，以细腻的情感和柔和的编曲打动人心。常探讨孤独、爱情与自我认知等主题。</div>
+      <div class="song-views">P主：DECO*27</div>
+    </div>
+
+    <div class="song-card glass" data-genre="rock">
+      <div class="song-cover"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g12" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#A855F7"/><stop offset="100%" stop-color="#FF6B9D"/></linearGradient></defs><rect width="600" height="300" fill="url(#g12)"/><text x="300" y="110" text-anchor="middle" fill="white" font-size="60" font-family="sans-serif" opacity="0.3">💫</text><text x="300" y="190" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif" font-weight="bold">ODDS&ENDS</text><text x="300" y="230" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.7">ryo (supercell) — 写给创作者的情书</text></svg></div>
+      <span class="song-number">12</span>
+      <div class="song-title">ODDS&ENDS</div><div class="song-title-jp">オッズアンドエンドス</div>
+      <div class="song-meta"><span class="song-tag rock">摇滚</span></div>
+      <div class="song-desc">ryo（supercell）关于VOCALOID文化的元叙事歌曲。歌词描绘了一位失去创作激情的音乐人重新通过初音未来找到灵感的故事，写给所有创作者的情书。</div>
+      <div class="song-views">📺 Niconico播放量：500万+ | P主：ryo (supercell)</div>
+    </div>
+  </div>
+</section>
+
+<!-- Producers -->
+<section id="producers">
+  <div class="section-header reveal">
+    <div class="section-tag">Producers</div>
+    <h2 class="section-title">知名P主</h2>
+    <p class="section-subtitle">赋予初音未来灵魂的创作者们——VOCALOID音乐的中流砥柱</p>
+  </div>
+  <div class="producers-grid reveal">
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#FF6B9D,#A855F7)">🎵</div>
+      <div class="producer-name">ryo</div><div class="producer-aka">supercell</div>
+      <div class="producer-style">流行 / 叙事</div>
+      <div class="producer-desc">初音未来音乐的奠基人之一。作品以旋律优美、歌词细腻著称，「メルト」「World is Mine」「ODDS&ENDS」等代表作定义了VOCALOID流行音乐的标杆。后以supercell名义签约SONY出道。</div>
+      <div class="producer-works">代表作：メルト / World is Mine / ODDS&ENDS</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#6366F1,#A855F7)">🎸</div>
+      <div class="producer-name">wowaka</div><div class="producer-aka">現実逃避P</div>
+      <div class="producer-style">摇滚 / 电子</div>
+      <div class="producer-desc">VOCALOID音乐史上最具影响力的创作者之一。以高速、密集、充满情绪冲击力的音乐风格闻名。2019年不幸离世，年仅31岁，留给世界永恒的音乐遗产。</div>
+      <div class="producer-works">代表作：ロールギャール / 裏表ラバーズ / ワンダーラスト</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#38BDF8,#39C5BB)">🎹</div>
+      <div class="producer-name">kz</div><div class="producer-aka">livetune</div>
+      <div class="producer-style">电子 / 流行</div>
+      <div class="producer-desc">初音未来最早的顶级P主之一，电子音乐风格精致优美。为Google Chrome制作的「Tell Your World」成为初音未来走向主流市场的关键作品。</div>
+      <div class="producer-works">代表作：Tell Your World / ファインダー / last weekend</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#1a1a2e,#FF6B9D)">🖤</div>
+      <div class="producer-name">DECO*27</div><div class="producer-aka">デコ・ニーナ</div>
+      <div class="producer-style">流行 / 摇滚</div>
+      <div class="producer-desc">当代最活跃的VOCALOID P主之一，作品风格多变，擅长用VOCALOID表达细腻的情感。近年以「乙女解剖」等作品再度引发热潮。</div>
+      <div class="producer-works">代表作：乙女解剖 / ヒバナ / ポジティブ・ダンス・タイム</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#FCD34D,#FF6B9D)">🌸</div>
+      <div class="producer-name">黒うさP</div><div class="producer-aka">Kurousa-P</div>
+      <div class="producer-style">和风摇滚</div>
+      <div class="producer-desc">以「千本桜」闻名于世的创作者。将传统日本音乐元素与现代摇滚完美融合，创造了独特的大正浪漫风格。千本樱是初音未来人气最高的歌曲之一。</div>
+      <div class="producer-works">代表作：千本桜 / 六兆年と一夜物語 / ネクストネスト</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#39C5BB,#FCD34D)">⚡</div>
+      <div class="producer-name">Mitchie M</div><div class="producer-aka">みっちーえむ</div>
+      <div class="producer-style">流行 / 电子</div>
+      <div class="producer-desc">以超高真实度调教闻名的传奇P主。他的作品中初音未来的歌声几乎与真人无异，将VOCALOID的调教技术推向了极致。</div>
+      <div class="producer-works">代表作：Freely Tomorrow / アゲアゲアゲ / セカイはまだ始マらない</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#A855F7,#38BDF8)">💫</div>
+      <div class="producer-name">cosMo@暴走P</div><div class="producer-aka">cosMo</div>
+      <div class="producer-style">高速 / 电子</div>
+      <div class="producer-desc">以极端高速编曲闻名，作品BPM常超过200。「初音ミクの消失」是VOCALOID音乐中最具技术挑战性的作品之一。</div>
+      <div class="producer-works">代表作：初音ミクの消失 / ドッペルゲンガー</div>
+    </div>
+    <div class="producer-card glass">
+      <div class="producer-icon" style="background:linear-gradient(135deg,#FF6B9D,#FCD34D)">🎮</div>
+      <div class="producer-name">Junky</div><div class="producer-aka">じゃんきー</div>
+      <div class="producer-style">流行 / 可爱风</div>
+      <div class="producer-desc">以可爱活力风格著称的P主，善于创作旋律洗脑、节奏欢快的歌曲。作品中的初音未来总是充满元气与个性。</div>
+      <div class="producer-works">代表作：メランコリック / 有頂天ビバーチェ</div>
+    </div>
+  </div>
+</section>
+
+<!-- Concerts -->
+<section id="concerts">
+  <div class="section-header reveal">
+    <div class="section-tag">Live</div>
+    <h2 class="section-title">全息演唱会</h2>
+    <p class="section-subtitle">虚拟歌姬走上真实舞台，用全息投影创造奇迹</p>
+  </div>
+  <div class="concert-grid reveal">
+    <div class="concert-card glass">
+      <div class="concert-img-wrap"><img src="https://safebooru.org/images/816/012b3351040876ccde8823ef84bdbe2d86e3d04b.png" alt="初音未来演唱会" class="concert-img"></div>
+      <div class="concert-year">2009</div><div class="concert-name">初音ミク ライブパーティー</div><div class="concert-location">📍 日本 Zepp Tokyo</div>
+      <div class="concert-desc">首次以全息投影技术呈现的初音未来演唱会。约2500名观众见证了一个虚拟角色在真实舞台上歌唱的历史性时刻。</div>
+    </div>
+    <div class="concert-card glass">
+      <div class="concert-img-wrap"><img src="https://safebooru.org/images/304/ba6fed8e9925ce6d54b484220f48c5bcb0de64ba.jpg" alt="ミクFES" class="concert-img"></div>
+      <div class="concert-year">2010</div><div class="concert-name">ミクFES'10 (Summer)</div><div class="concert-location">📍 日本 Zepp Tokyo</div>
+      <div class="concert-desc">初音未来三周年纪念演唱会，规模升级。舞台效果更加精美，全息投影技术进一步成熟。一票难求。</div>
+    </div>
+    <div class="concert-card glass">
+      <div class="concert-img-wrap"><img src="https://safebooru.org/images/2453/26972610c2cdddcf2ab3ad66efe2fdaecca95865.jpg" alt="MIKUNOPOLIS" class="concert-img"></div>
+      <div class="concert-year">2011</div><div class="concert-name">MIKUNOPOLIS in LA</div><div class="concert-location">📍 美国洛杉矶 Anime Expo</div>
+      <div class="concert-desc">初音未来首次在北美举办的大型演唱会，数千名海外粉丝参与，标志着初音未来正式成为全球性的文化符号。</div>
+    </div>
+    <div class="concert-card glass">
+      <div class="concert-img-wrap"><img src="https://safebooru.org/images/822/e804c371d1b355e47a86db7e371fe3737a113a9d.jpg" alt="横浜アリーナ" class="concert-img"></div>
+      <div class="concert-year">2012</div><div class="concert-name">初音ミク ライブパーティー 2012</div><div class="concert-location">📍 日本 横浜アリーナ</div>
+      <div class="concert-desc">移师横浜アリーナ举行，规模更大。新增镜音铃、连等其他VOCALOID角色同台演出。演唱会DVD全球热销。</div>
+    </div>
+    <div class="concert-card glass">
+      <div class="concert-img-wrap"><img src="https://safebooru.org/images/3124/1a797ff99f03e09ee5111424542918553745d561.png" alt="MIKU EXPO" class="concert-img"></div>
+      <div class="concert-year">2014</div><div class="concert-name">HATSUNE MIKU EXPO 2014</div><div class="concert-location">📍 印尼雅加达 / 美国洛杉矶·纽约</div>
+      <div class="concert-desc">首次在东南亚和美国东海岸举办。纽约站由漫画家奥浩哉设计特别舞台视觉，展示了初音未来在全球的文化影响力。</div>
+    </div>
+    <div class="concert-card glass">
+      <div class="concert-img-wrap"><img src="https://safebooru.org/images/568/a6204ec1f141e491f107cecb87aaa4fecf357a5d.jpg" alt="世界巡演" class="concert-img"></div>
+      <div class="concert-year">2024</div><div class="concert-name">MIKU EXPO WORLD TOUR</div><div class="concert-location">📍 全球多城市巡演</div>
+      <div class="concert-desc">初音未来最大规模的世界巡演，覆盖亚洲、北美、欧洲、南美。全新3D舞台效果与升级的全息投影技术，进入新纪元。</div>
+    </div>
+  </div>
+</section>
+
+<!-- Voicebank History -->
+<section id="voicebank">
+  <div class="section-header reveal">
+    <div class="section-tag">Voice Bank</div>
+    <h2 class="section-title">历代声源</h2>
+    <p class="section-subtitle">从 VOCALOID2 到 V6，初音未来的声音不断进化</p>
+  </div>
+  <div class="vb-timeline reveal">
+    <div class="vb-card glass">
+      <div class="vb-version" style="color:var(--miku-cyan)">V2</div>
+      <div class="vb-year">2007.08.31</div>
+      <div class="vb-engine">VOCALOID 2</div>
+      <div class="vb-desc">初音未来的首个声源库。以声优藤田咲的声音为基础采样，包含原声（Original）和Soft两种音色。发售首日即售出3000套以上，两周内突破数万套。</div>
+      <div class="vb-badge">🏆 初代声源 · 革命开端</div>
+    </div>
+    <div class="vb-card glass">
+      <div class="vb-version" style="color:var(--accent-purple)">V3</div>
+      <div class="vb-year">2012</div>
+      <div class="vb-engine">VOCALOID 3</div>
+      <div class="vb-desc">随VOCALOID3引擎升级。音质更清晰，日语发音更自然。新增了英语声源库「Hatsune Miku English」，使初音未来可以用英文演唱，极大拓展了国际市场。</div>
+      <div class="vb-badge">🌍 英语声源 · 国际化</div>
+    </div>
+    <div class="vb-card glass">
+      <div class="vb-version" style="color:var(--accent-pink)">V4</div>
+      <div class="vb-year">2016</div>
+      <div class="vb-engine">VOCALOID 4</div>
+      <div class="vb-desc">引入E.V.E.C.（Enhanced Voice Expression Control）技术，支持更丰富的情感表达。新增「Solid」音色包，声音更有力度。支持Cross-Synthesis（XSY），可在不同音色间平滑过渡。</div>
+      <div class="vb-badge">✨ E.V.E.C. · 情感表达</div>
+    </div>
+    <div class="vb-card glass">
+      <div class="vb-version" style="color:var(--accent-yellow)">V4X</div>
+      <div class="vb-year">2016</div>
+      <div class="vb-engine">VOCALOID 4</div>
+      <div class="vb-desc">初音未来V4X版本，包含Original、Soft、Sweet、Dark、Solid五种音色。配合Piapro Studio使用，可通过E.V.E.C.控制气息、力度等参数，调教出极为细腻的歌声。</div>
+      <div class="vb-badge">🎨 五种音色 · 极致调教</div>
+    </div>
+    <div class="vb-card glass">
+      <div class="vb-version" style="color:#38BDF8">V5</div>
+      <div class="vb-year">2020</div>
+      <div class="vb-engine">VOCALOID 5</div>
+      <div class="vb-desc">基于VOCALOID 5引擎重建，音质进一步提升。支持更多音域和发声方式。AI辅助功能初步引入，使调教过程更加智能化。与Crypton自家的Piapro Studio NT深度整合。</div>
+      <div class="vb-badge">🤖 AI辅助 · 智能化</div>
+    </div>
+    <div class="vb-card glass" style="border-color:rgba(57,197,187,.4);background:rgba(57,197,187,.06)">
+      <div class="vb-version" style="color:var(--miku-cyan)">V6</div>
+      <div class="vb-year">2026.04.14</div>
+      <div class="vb-engine">VOCALOID 6</div>
+      <div class="vb-desc">全新AI驱动的歌声合成引擎。采用深度学习模型，歌声自然度质的飞跃。支持实时参数调节、多语言演唱、情感自动识别。同步推出全新视觉形象设计，标志虚拟歌手新纪元。</div>
+      <div class="vb-badge">🚀 AI深度学习 · 新纪元</div>
+    </div>
+  </div>
+  <div class="about-content glass reveal" style="margin-top:32px">
+    <p class="about-text">初音未来的声源均来自日本声优<span class="highlight">藤田咲（Saki Fujita）</span>。录制时，她需要将日语中所有的音素组合（约500个）逐一录制，再经过精密的数字处理，才能组成VOCALOID引擎可用的声源库。每个版本的录制都历时数月，藤田咲需要在录音棚中保持极其稳定的音色和音准，以确保合成歌声的质量。</p>
+    <p class="about-text">从V2到V6，初音未来的声音经历了从「机械感」到「几乎听不出是合成」的蜕变。V2时代的歌声带有明显的电子合成质感，反而成为了一种独特的美学特征；V4X时代通过E.V.E.C.技术可以模拟呼吸、换气等细节；而V6的AI引擎则可以自动生成极为自然的颤音、滑音等歌唱技巧——<span class="highlight">初音未来的歌声，从未停止进化。</span></p>
+  </div>
+</section>
+
+<!-- Vocaloid Family -->
+<section id="family">
+  <div class="section-header reveal">
+    <div class="section-tag">Family</div>
+    <h2 class="section-title">VOCALOID 家族</h2>
+    <p class="section-subtitle">CRYPTON FUTURE MEDIA 旗下 Piapro Characters</p>
+  </div>
+  <div class="family-grid reveal">
+    <div class="family-card glass" style="border-color:rgba(57,197,187,.25)">
+      <div class="family-avatar" style="background:linear-gradient(135deg,rgba(57,197,187,.3),rgba(57,197,187,.1))">🎤</div>
+      <div class="family-name"><span class="family-color" style="background:#39C5BB"></span>初音ミク</div>
+      <div class="family-jp">Hatsune Miku</div>
+      <div class="family-info">VOCALOID2 · 2007<br>声源：藤田咲<br>代表色：葱绿 #39C5BB<br>158cm · 16岁 · 双马尾</div>
+    </div>
+    <div class="family-card glass" style="border-color:rgba(255,206,86,.25)">
+      <div class="family-avatar" style="background:linear-gradient(135deg,rgba(255,206,86,.3),rgba(255,206,86,.1))">🔔</div>
+      <div class="family-name"><span class="family-color" style="background:#FFCE56"></span>鏡音リン</div>
+      <div class="family-jp">Kagamine Rin</div>
+      <div class="family-info">VOCALOID2 · 2007<br>声源：下田麻美<br>代表色：柠檬黄 #FFCE56<br>152cm · 14岁 · 双子（姐）</div>
+    </div>
+    <div class="family-card glass" style="border-color:rgba(255,206,86,.25)">
+      <div class="family-avatar" style="background:linear-gradient(135deg,rgba(255,206,86,.3),rgba(255,206,86,.1))">🎵</div>
+      <div class="family-name"><span class="family-color" style="background:#FFCE56"></span>鏡音レン</div>
+      <div class="family-jp">Kagamine Len</div>
+      <div class="family-info">VOCALOID2 · 2007<br>声源：下田麻美<br>代表色：柠檬黄 #FFCE56<br>156cm · 14岁 · 双子（弟）</div>
+    </div>
+    <div class="family-card glass" style="border-color:rgba(232,67,147,.25)">
+      <div class="family-avatar" style="background:linear-gradient(135deg,rgba(232,67,147,.3),rgba(232,67,147,.1))">🎶</div>
+      <div class="family-name"><span class="family-color" style="background:#E84393"></span>巡音ルカ</div>
+      <div class="family-jp">Megurine Luka</div>
+      <div class="family-info">VOCALOID2 · 2009<br>声源：浅川悠<br>代表色：粉红 #E84393<br>162cm · 20岁 · 可唱日/英双语</div>
+    </div>
+    <div class="family-card glass" style="border-color:rgba(231,76,60,.25)">
+      <div class="family-avatar" style="background:linear-gradient(135deg,rgba(231,76,60,.3),rgba(231,76,60,.1))">🍷</div>
+      <div class="family-name"><span class="family-color" style="background:#E74C3C"></span>MEIKO</div>
+      <div class="family-jp">MEIKO</div>
+      <div class="family-info">VOCALOID · 2004<br>声源：拜乡芽衣子<br>代表色：红色 #E74C3C<br>165cm · 20岁 · 初代VOCALOID</div>
+    </div>
+    <div class="family-card glass" style="border-color:rgba(52,152,219,.25)">
+      <div class="family-avatar" style="background:linear-gradient(135deg,rgba(52,152,219,.3),rgba(52,152,219,.1))">🧊</div>
+      <div class="family-name"><span class="family-color" style="background:#3498DB"></span>KAITO</div>
+      <div class="family-jp">KAITO</div>
+      <div class="family-info">VOCALOID · 2006<br>声源：風雅なおと<br>代表色：蓝色 #3498DB<br>178cm · 20岁 · 围巾少年</div>
+    </div>
+  </div>
+  <div class="about-content glass reveal" style="margin-top:32px">
+    <p class="about-text">VOCALOID家族由CRYPTON FUTURE MEDIA旗下的「<span class="highlight">Piapro Characters</span>」品牌统一运营。按发售顺序排列：<span class="highlight">MEIKO</span>（2004）和<span class="highlight">KAITO</span>（2006）是初代VOCALOID角色；随后<span class="highlight">初音未来</span>、<span class="highlight">镜音铃·连</span>（2007）和<span class="highlight">巡音流歌</span>（2009）组成了VOCALOID2时代的经典五人组。</p>
+    <p class="about-text">这些角色不仅共享同一个创作平台，还经常在同一首歌中合作——P主们将不同角色的音色搭配使用，创造出丰富的和声与对话效果。在演唱会上，他们也经常同台演出，形成了独特的「VOCALOID家族」文化。</p>
+  </div>
+</section>
+
+<!-- Games -->
+<section id="games">
+  <div class="section-header reveal">
+    <div class="section-tag">Games</div>
+    <h2 class="section-title">游戏世界</h2>
+    <p class="section-subtitle">从街机到手游，用节奏感受初音未来的音乐宇宙</p>
+  </div>
+  <div class="games-grid reveal">
+    <div class="game-card glass">
+      <div class="game-img"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="game1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#39C5BB"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><rect width="600" height="300" fill="url(#game1)"/><text x="300" y="130" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif" font-weight="bold">PROJECT DIVA</text><text x="300" y="170" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.8">SEGA · Rhythm Game</text><text x="300" y="210" text-anchor="middle" fill="white" font-size="60" font-family="sans-serif" opacity="0.3">🎮</text></svg></div>
+      <div class="game-title">Hatsune Miku: Project DIVA</div>
+      <div class="game-subtitle">SEGA · 2009—至今 · 多平台</div>
+      <div class="game-tags"><span class="game-tag">节奏游戏</span><span class="game-tag">PS/PSP/Switch/PC</span></div>
+      <div class="game-desc">初音未来最经典的游戏系列。玩家需要根据音乐节奏按下对应按键，完成各种难度的曲目。每首歌曲配有精美的PV（音乐视频），部分PV由知名创作者制作。系列累计销量超过600万份。</div>
+      <div class="game-stat">📦 代表作：Project DIVA Arcade Future Tone / Mega39's+</div>
+    </div>
+    <div class="game-card glass">
+      <div class="game-img"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="game2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B9D"/><stop offset="100%" stop-color="#38BDF8"/></linearGradient></defs><rect width="600" height="300" fill="url(#game2)"/><text x="300" y="115" text-anchor="middle" fill="white" font-size="22" font-family="sans-serif" font-weight="bold">PROJECT SEKAI</text><text x="300" y="150" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.8">feat. 初音ミク Colorful Stage!</text><text x="300" y="195" text-anchor="middle" fill="white" font-size="16" font-family="sans-serif" opacity="0.7">SEGA × COLORFUL PALETTE</text><text x="300" y="240" text-anchor="middle" fill="white" font-size="50" font-family="sans-serif" opacity="0.3">📱</text></svg></div>
+      <div class="game-title">Project SEKAI feat. 初音ミク</div>
+      <div class="game-subtitle">SEGA × COLORFUL PALETTE · 2020—至今 · iOS/Android</div>
+      <div class="game-tags"><span class="game-tag">音乐手游</span><span class="game-tag">剧情模式</span><span class="game-tag">多人共演</span></div>
+      <div class="game-desc">初音未来手游时代的巅峰之作。游戏拥有原创的虚拟世界「SEKAI」，每个SEKAI由不同风格的音乐主题构成。玩家不仅能演奏VOCALOID经典曲目，还能体验5个原创乐团的青春故事。累计下载量超过3000万。</div>
+      <div class="game-stat">📊 全球下载量：3000万+ | 曲目数：1000+</div>
+    </div>
+    <div class="game-card glass">
+      <div class="game-img"><svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="game3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FCD34D"/><stop offset="100%" stop-color="#FF6B9D"/></linearGradient></defs><rect width="600" height="300" fill="url(#game3)"/><text x="300" y="130" text-anchor="middle" fill="white" font-size="22" font-family="sans-serif" font-weight="bold">MIKU TAP</text><text x="300" y="170" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" opacity="0.8">Hatsune Miku: Colorful Stage!</text><text x="300" y="210" text-anchor="middle" fill="white" font-size="50" font-family="sans-serif" opacity="0.3">🌍</text></svg></div>
+      <div class="game-title">其他经典游戏</div>
+      <div class="game-subtitle">初音未来 × 多元游戏宇宙</div>
+      <div class="game-tags"><span class="game-tag">Project DIVA</span><span class="game-tag">Project MIRAI</span><span class="game-tag">VR</span></div>
+      <div class="game-desc">除了核心系列外，初音未来还出现在众多游戏中：3DS平台的「Project MIRAI」系列采用Q版角色风格；「初音ミク VR」让玩家在虚拟现实中近距离欣赏演唱会；她还客串过《怪物猎人》《铁拳》等知名游戏。</div>
+      <div class="game-stat">🎮 跨平台：PS / Xbox / Switch / 3DS / VR / 手机</div>
+    </div>
+  </div>
+</section>
+
+<!-- Lyrics Wall -->
+<section id="lyrics">
+  <div class="section-header reveal">
+    <div class="section-tag">Lyrics</div>
+    <h2 class="section-title">经典歌词</h2>
+    <p class="section-subtitle">那些让人心动的瞬间，初音未来唱出的文字</p>
+  </div>
+  <div class="lyrics-carousel reveal" id="lyricsCarousel">
+    <div class="lyric-slide glass active">
+      <div class="lyric-text">「あの日見渡した渚の地は<br>今でもずっと　変わらないね」</div>
+      <div class="lyric-source">—— 星之碎片（星のカケラ）</div>
+      <div class="lyric-artist">P主：DECO*27</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「君の知らない物語<br>誰にもまだ話した事のない」</div>
+      <div class="lyric-source">—— 君の知らない物語</div>
+      <div class="lyric-artist">P主：ryo (supercell)</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「ねぇ、もしも全て投げ舍てられたら<br>笑って生きていけるはずだ」</div>
+      <div class="lyric-source">—— ロールギャール（Rolling Girl）</div>
+      <div class="lyric-artist">P主：wowaka (現実逃避P)</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「千本桜　夜ニ紛レ<br>君ハ死ニツキル」</div>
+      <div class="lyric-source">—— 千本桜（千本樱）</div>
+      <div class="lyric-artist">P主：黒うさP</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「So, tell me your world.<br>I'm here with you.」</div>
+      <div class="lyric-source">—— Tell Your World</div>
+      <div class="lyric-artist">P主：kz (livetune)</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「僕が僕でいられたのは<br>君がいたからだよ」</div>
+      <div class="lyric-source">—— ODDS&ENDS</div>
+      <div class="lyric-artist">P主：ryo (supercell)</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「自由になる　明日への道<br>Freely Tomorrow」</div>
+      <div class="lyric-source">—— Freely Tomorrow</div>
+      <div class="lyric-artist">P主：Mitchie M</div>
+    </div>
+    <div class="lyric-slide glass">
+      <div class="lyric-text">「メルト　恋したい！<br>メルト　駄目なのに！」</div>
+      <div class="lyric-source">—— メルト（MELT）</div>
+      <div class="lyric-artist">P主：ryo (supercell)</div>
+    </div>
+    <div class="lyric-dots" id="lyricDots"></div>
+  </div>
+</section>
+
+<!-- Merch & Collabs -->
+<section id="merch">
+  <div class="section-header reveal">
+    <div class="section-tag">Merch & Collabs</div>
+    <h2 class="section-title">周边 & 联名</h2>
+    <p class="section-subtitle">从手办到奢侈品牌，初音无处不在</p>
+  </div>
+  <div class="merch-grid reveal">
+    <div class="merch-card glass">
+      <div class="merch-icon">🏎️</div>
+      <div class="merch-title">GOODSMILE RACING</div>
+      <div class="merch-desc">Good Smile Racing 每年推出初音未来涂装赛车参加Super GT赛事。Racing Miku 形象每年由不同画师设计，成为车迷和Miku粉丝的收藏热门。</div>
+    </div>
+    <div class="merch-card glass">
+      <div class="merch-icon">👗</div>
+      <div class="merch-title">时尚联名</div>
+      <div class="merch-desc">与 Louis Vuitton（2013）、Marc Jacobs、COMME des GARÇONS 等奢侈品牌合作。LV曾为初音未来设计特别造型，登上品牌广告大片。</div>
+    </div>
+    <div class="merch-card glass">
+      <div class="merch-icon">🚗</div>
+      <div class="merch-title">Toyota 广告</div>
+      <div class="merch-desc">2011年Toyota Corolla采用初音未来「世界第一公主殿下」作为美国市场广告曲。这是虚拟歌手首次代言主流汽车品牌，引发全球关注。</div>
+    </div>
+    <div class="merch-card glass">
+      <div class="merch-icon">🎎</div>
+      <div class="merch-title">手办模型</div>
+      <div class="merch-desc">Good Smile Company、SEGA、寿屋等厂商推出数百款初音未来手办。从粘土人到1/7比例模型，涵盖各种风格和造型，是手办界最热门的IP之一。</div>
+    </div>
+    <div class="merch-card glass">
+      <div class="merch-icon">🖼️</div>
+      <div class="merch-title">艺术展览</div>
+      <div class="merch-desc">初音未来的作品曾在纽约MoMA（现代艺术博物馆）展出。全球多地举办过大型艺术展，展示VOCALOID文化对当代艺术的深远影响。</div>
+    </div>
+    <div class="merch-card glass">
+      <div class="merch-icon">🎪</div>
+      <div class="merch-title">主题乐园</div>
+      <div class="merch-desc">日本多地设有初音未来主题咖啡厅、快闪店和限定活动。2024年在东京开设常设体验空间「MIKU LAND」，提供沉浸式互动体验。</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-header reveal">
+    <div class="section-tag">FAQ</div>
+    <h2 class="section-title">常见问题</h2>
+    <p class="section-subtitle">关于初音未来，新粉丝最想知道的事</p>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item glass">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>初音未来是AI吗？</span><span class="arrow">▼</span></div>
+      <div class="faq-a">不是传统意义上的AI。初音未来是一个基于VOCALOID语音合成技术的音源库。用户输入旋律和歌词，软件将预录制的声音片段合成歌曲。不过V6版本引入了深度学习技术，在合成自然度上已经非常接近AI水平。严格来说，她是「声音合成软件的角色形象」，而非自主思考的AI。</div>
+    </div>
+    <div class="faq-item glass">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>初音未来的歌曲是谁创作的？</span><span class="arrow">▼</span></div>
+      <div class="faq-a">初音未来的所有歌曲都由世界各地的创作者（被称为「P主/Producer」）创作。任何人都可以购买VOCALOID软件，为初音未来写词作曲并发布。这就是初音未来最大的魅力——她不被任何唱片公司或官方团队控制，她的音乐来自全世界每一个热爱创作的人。</div>
+    </div>
+    <div class="faq-item glass">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>「39」对初音未来有什么特殊含义？</span><span class="arrow">▼</span></div>
+      <div class="faq-a">「39」是初音未来的代表数字。在日语中，3可以读作「ミ（mi）」，9可以读作「ク（ku）」，合起来就是「ミク（Miku）」。同时，39也可以读作「サンキュー（Thank You）」。因此3月9日被粉丝定为「ミクの日（Miku Day）」，每年这一天全球粉丝都会举办庆祝活动。</div>
+    </div>
+    <div class="faq-item glass">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>初音未来的演唱会是怎么实现的？</span><span class="arrow">▼</span></div>
+      <div class="faq-a">初音未来的演唱会使用半透明特殊屏幕（如Dilad Screen），将3D CGI动画投影在舞台上，配合精心设计的灯光效果，创造出初音未来「真的在舞台上唱歌」的视觉效果。演出音乐由专业乐队现场演奏，初音未来的3D模型动作由专业团队预先制作。整个效果融合了投影技术、CGI和现场演出。</div>
+    </div>
+    <div class="faq-item glass">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>如何开始为初音未来创作歌曲？</span><span class="arrow">▼</span></div>
+      <div class="faq-a">你需要购买初音未来的VOCALOID声源软件（或使用免费的Piapro Studio试用版），然后学习基本的音乐制作知识：旋律输入、歌词编辑、参数调节。很多P主都是从零开始自学的！推荐先从Niconico或Bilibili上的教程视频入手，社区非常友好，有很多老P主愿意指导新人。</div>
+    </div>
+    <div class="faq-item glass">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>初音未来在中国有人气吗？</span><span class="arrow">▼</span></div>
+      <div class="faq-a">有极高的人气！初音未来在Bilibili拥有数百万粉丝，相关视频播放量累计超过数十亿。她曾多次在中国举办演唱会（MIKU EXPO 上海/北京/广州站等），门票通常在几分钟内售罄。中国也有自己的VOCALOID中文角色——洛天依，两者在Bilibili上共同构成了庞大的虚拟歌手社区。</div>
+    </div>
+  </div>
+</section>
+
+<!-- Impact -->
+<section id="impact">
+  <div class="section-header reveal">
+    <div class="section-tag">Impact</div>
+    <h2 class="section-title">文化影响</h2>
+    <p class="section-subtitle">一个虚拟角色如何改变了音乐、技术与文化</p>
+  </div>
+  <div class="impact-grid reveal">
+    <div class="impact-card glass">
+      <div class="impact-img-wrap"><img src="https://safebooru.org/images/1840/7a522ab3f782fa968aae4ad15076c9b1e688b3c9.jpg" alt="音乐创作" class="impact-img"></div>
+      <div class="impact-icon">🎶</div><div class="impact-title">音乐民主化</div>
+      <div class="impact-desc">初音未来打破了传统音乐产业的门槛。不需要签约唱片公司、不需要专业录音棚，任何人都可以创作和发布音乐。这种UGC模式深刻影响了后来的独立音乐生态和创作者经济。</div>
+    </div>
+    <div class="impact-card glass">
+      <div class="impact-img-wrap"><img src="https://safebooru.org/images/312/b23302ec65a2315399de3a2e850b41283d7136df.png" alt="二次元文化" class="impact-img"></div>
+      <div class="impact-icon">🌐</div><div class="impact-title">二次元文化输出</div>
+      <div class="impact-desc">初音未来是日本二次元文化向全球输出的最成功案例之一。从Niconico到YouTube，从日本到全世界，她让无数人第一次接触到了VOCALOID文化。</div>
+    </div>
+    <div class="impact-card glass">
+      <div class="impact-img-wrap"><img src="https://safebooru.org/images/568/50585b8558e9766783441cc9a11c1b750f35006c.jpg" alt="AI虚拟人" class="impact-img"></div>
+      <div class="impact-icon">🤖</div><div class="impact-title">AI 与虚拟人先驱</div>
+      <div class="impact-desc">初音未来被视为AI虚拟人的先驱。在深度学习和AI歌声合成兴起之前，VOCALOID就已经在探索人机协作创作音乐的可能性。</div>
+    </div>
+    <div class="impact-card glass">
+      <div class="impact-img-wrap"><img src="https://safebooru.org/images/568/a6204ec1f141e491f107cecb87aaa4fecf357a5d.jpg" alt="身份认同" class="impact-img"></div>
+      <div class="impact-icon">🎭</div><div class="impact-title">身份与认同</div>
+      <div class="impact-desc">初音未来没有固定的"人格"——她的性格、故事、形象都由创作者赋予。这种开放性使得每个人都能在她身上找到自己的投射。</div>
+    </div>
+    <div class="impact-card glass">
+      <div class="impact-img-wrap"><img src="https://safebooru.org/images/822/e804c371d1b355e47a86db7e371fe3737a113a9d.jpg" alt="商业帝国" class="impact-img"></div>
+      <div class="impact-icon">💰</div><div class="impact-title">商业帝国</div>
+      <div class="impact-desc">初音未来已形成庞大的商业生态：游戏（Project SEKAI）、手办、联名商品（LV、Toyota、Google等）、演唱会、周边等。累计经济规模超过100亿日元。</div>
+    </div>
+    <div class="impact-card glass">
+      <div class="impact-img-wrap"><img src="https://safebooru.org/images/3124/1a797ff99f03e09ee5111424542918553745d561.png" alt="共创美学" class="impact-img"></div>
+      <div class="impact-icon">🎨</div><div class="impact-title">共创美学</div>
+      <div class="impact-desc">初音未来的形象从未被"官方"固定。无数画师、动画师、3D建模师赋予她新的面貌。这种"共创美学"深刻影响了后来的虚拟偶像设计。</div>
+    </div>
+  </div>
+</section>
+
+<!-- V6 -->
+<section>
+  <div class="v6-banner glass-strong reveal">
+    <div class="v6-content">
+      <div class="v6-label">LATEST NEWS</div>
+      <div class="v6-title">初音未来 V6</div>
+      <div class="v6-img">
+        <img src="https://safebooru.org/images/568/50585b8558e9766783441cc9a11c1b750f35006c.jpg" alt="初音未来 V6">
+      </div>
+      <div class="v6-desc" style="margin-top:24px">2026年4月14日，全新版本「初音未来 V6」声音合成软件正式发售。<br>全面升级的语音合成引擎带来更加真实的歌声表现，同步推出全新的初音未来视觉形象。<br>经过近二十年的发展，初音未来的声音从未停止进化——<span class="highlight">来自未来的最初之音，继续响彻未来。</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">HATSUNE MIKU</div>
+  <p class="footer-text">初音ミク — 来自未来的最初之音</p>
+  <p class="footer-text">Created with ❤️ for all Miku fans worldwide</p>
+  <p class="footer-text" style="margin-top:16px;font-size:.75rem">© Crypton Future Media, INC. — 本页面仅供粉丝交流与学习使用</p>
+  <div class="footer-links">
+    <a href="https://piapro.net/" target="_blank">Piapro 官方</a>
+    <a href="https://www.youtube.com/user/mikumikumikumiku" target="_blank">YouTube</a>
+    <a href="https://ch.nicovideo.jp/miku" target="_blank">Niconico</a>
+    <a href="https://store.steampowered.com/app/1762570/Hatsune_Miku_Project_DIVA_MEGA39_DX/" target="_blank">Project DIVA</a>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('pageLoader').classList.add('hidden')},800)});
+const pc=document.getElementById('particles');
+for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*4+2;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*15+10)+'s';p.style.animationDelay=(Math.random()*10)+'s';pc.appendChild(p)}
+const vis=document.getElementById('visualizer');
+for(let i=0;i<40;i++){const b=document.createElement('div');b.className='bar';b.style.setProperty('--bar-height',(Math.random()*45+10)+'px');b.style.animationDelay=(i*.05)+'s';b.style.animationDuration=(.5+Math.random()*.6)+'s';vis.appendChild(b)}
+const nb=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{nb.classList.toggle('scrolled',window.scrollY>50);document.getElementById('backToTop').classList.toggle('visible',window.scrollY>600)});
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open')}
+function closeNav(){document.getElementById('navLinks').classList.remove('open')}
+const obs=new IntersectionObserver(e=>{e.forEach(n=>{if(n.isIntersecting)n.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const co=new IntersectionObserver(e=>{e.forEach(n=>{if(n.isIntersecting){const c=n.target,t=+c.dataset.target,d=2000,st=t/(d/16);let cur=0;const u=()=>{cur+=st;if(cur<t){c.textContent=Math.floor(cur).toLocaleString();requestAnimationFrame(u)}else{c.textContent=t.toLocaleString()}};u();co.unobserve(c)}})},{threshold:.5});
+document.querySelectorAll('.counter').forEach(c=>co.observe(c));
+function filterSongs(g){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');document.querySelectorAll('.song-card').forEach(c=>{if(g==='all'||c.dataset.genre===g){c.style.display='block';c.style.animation='fadeInUp .5s ease'}else{c.style.display='none'}})}
+function toggleFaq(el){el.parentElement.classList.toggle('open')}
+
+// Lyrics Carousel
+const slides=document.querySelectorAll('.lyric-slide');
+const dotsC=document.getElementById('lyricDots');
+let curSlide=0;
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='lyric-dot'+(i===0?' active':'');d.onclick=()=>goSlide(i);dotsC.appendChild(d)});
+function goSlide(n){slides[curSlide].classList.remove('active');dotsC.children[curSlide].classList.remove('active');curSlide=n;slides[curSlide].classList.add('active');dotsC.children[curSlide].classList.add('active')}
+setInterval(()=>goSlide((curSlide+1)%slides.length),5000);
+
+document.addEventListener('mousemove',e=>{const x=(e.clientX/innerWidth-.5)*10,y=(e.clientY/innerHeight-.5)*10;document.querySelector('.bg-canvas').style.transform=`translate(${x}px,${y}px)`});
+</script>
+</body>
+</html>
